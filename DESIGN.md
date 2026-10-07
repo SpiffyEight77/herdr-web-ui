@@ -12,7 +12,7 @@ chrome color, amber: focus, the chosen lens, the terminal cursor and the user's 
 buttons). Agent states carry the remaining saturated colors and none of them is amber. The user's
 chat turns are neutral raised cards, so a long thread never turns into a wall of color. Dark is the
 default, light follows the same hierarchy, and comfortable or compact density changes scale without
-changing information architecture. A neutral charcoal look and Catppuccin are
+changing information architecture. A neutral charcoal look, Catppuccin and Rosé Pine are
 opt-in palettes (Settings → Appearance → Colors); amber stays the default and the look before settings load.
 
 The sidebar is one grid: a leading cell that says who or what a row is (the coding agent's brand
@@ -79,14 +79,14 @@ paper, not UI, and the viewer (`.file-viewer-pdf`) must not tint it for the them
 
 ### Opt-in palettes
 
-`settings.palette` (`amber` default, `charcoal`, `catppuccin`) is written as `data-palette`. The
-tables above are amber, the base blocks; the two opt-in palettes override them in
+`settings.palette` (`amber` default, `charcoal`, `catppuccin`, `rose-pine`) is written as `data-palette`. The
+tables above are amber, the base blocks; the three opt-in palettes override them in
 `[data-theme][data-palette]` blocks of `src/styles.css`, which hold the complete values.
 
 `--bubble-border` is the edge of the chat's user bubble. It is `transparent` where `--bg-elevated`
 alone parts the bubble from `--bg`: dark amber and dark charcoal. It is `var(--border)`
 where the two surfaces sit close: every light theme (the `[data-theme="light"]` block sets it for
-all palettes) and dark Catppuccin, whose elevated surface is darker than its canvas.
+all palettes), dark Rosé Pine and dark Catppuccin, whose elevated surface is darker than its canvas.
 
 - **Charcoal** is a neutral Ghostty-style dark: `--bg` `#0f0f0f`, panel and terminal `#171717`, text
   `#cbc7c0` / `#918c85` / `#f5f2ec`, accent and primary near-white `#e8e4dc` with `#171717` text,
@@ -107,6 +107,23 @@ all palettes) and dark Catppuccin, whose elevated surface is darker than its can
   `#d2d4dc`. Latte's accents are under 4.5:1 on these surfaces, so each keeps its hue and is darkened
   until it passes AA: Mauve `#712fc6` (primary hover is plain Latte Mauve `#8839ef`), Blue `#1750bf`,
   Red `#ac0c2f`, Green `#28651b`. It keeps amber's rounded corners.
+- **Rosé Pine** uses the [Moon palette](https://rosepinetheme.com/palette/) in dark and Dawn in
+  light. Moon: content, input and terminal use Base `#232136`, chrome
+  Surface `#2a273f`, elevated/hover Overlay `#393552`, borders Highlight Med `#44415a` / High
+  `#56526e`. Text is `#e0def4`; dimmed and idle use `#a3a0b8` (Subtle lightened 17%) to stay AA
+  on Overlay. Accent and primary use Iris `#c4a7e7`, primary hover `#d0b9ec` (Iris lightened 20%),
+  with Base text. States are Gold `#f6c177` / Rose `#ea9a97` / Foam `#9ccfd8`; Rose replaces
+  Love for readable input badges, with an 8% tint (the others 14%). Danger text and terminal
+  cursor are Rose `#ea9a97`, terminal selection Highlight Med `#44415a`. Accent/primary/danger
+  tints use 12%/16%/8%, the scrim Base at 60%; rounded corners and shadows stay unchanged.
+  The PWA title bar follows Surface.
+  Dawn maps the same roles: content and terminal Base `#faf4ed`, chrome and input Surface
+  `#fffaf3`, elevated/hover Overlay `#f2e9e1`, borders Highlight Med `#dfdad9` / High `#cecacd`,
+  text `#575279`, terminal cursor Rose `#d7827e`, selection Highlight Med. Its accents are too pale
+  for AA on its paper, so each is darkened just enough: dimmed and idle `#696680` (Subtle 13%),
+  accent and primary `#69597b` (Iris 27%, hover `#5c4e6c`) with Base text, states working
+  `#7e551c` (Gold 46%), input and danger text `#894b5d` (Love 24%), done `#3a656c` (Foam 32%), at
+  12% tints. The scrim and shadows are Text-tinted.
 
 ### Terminal theme
 
@@ -126,13 +143,32 @@ black or white. Dim text needs half that ratio, and box-drawing, block and power
 program's color so borders and bars still meet the background. Claude Code's default dark theme draws its question titles in `#ffffff`,
 which a light palette's terminal shows at 1.04 to 1.13:1.
 
+Rosé Pine also sets xterm's ANSI slots 0–15 to match Rosé Pine's
+Ghostty themes, Moon in dark and Dawn in light, which repeat slots 1–7 as 9–15. These are terminal-only values in `settings.ts`, not UI tokens:
+
+| ANSI color | Moon normal | Moon bright | Dawn normal | Dawn bright |
+|------------|-------------|-------------|-------------|-------------|
+| Black | `#393552` | `#6e6a86` | `#f2e9e1` | `#9893a5` |
+| Red | `#eb6f92` | `#eb6f92` | `#b4637a` | `#b4637a` |
+| Green | `#3e8fb0` | `#3e8fb0` | `#286983` | `#286983` |
+| Yellow | `#f6c177` | `#f6c177` | `#ea9d34` | `#ea9d34` |
+| Blue | `#9ccfd8` | `#9ccfd8` | `#56949f` | `#56949f` |
+| Magenta | `#c4a7e7` | `#c4a7e7` | `#907aa9` | `#907aa9` |
+| Cyan | `#ea9a97` | `#ea9a97` | `#d7827e` | `#d7827e` |
+| White | `#e0def4` | `#e0def4` | `#575279` | `#575279` |
+
+Other palettes keep xterm's default ANSI colors. Slots 16–255 and application
+true-color output are unchanged; Starship needs no separate configuration for named ANSI colors.
+
 ### Syntax highlighting
 
 Code in the chat and in the file viewer is colored by `--syntax-*` tokens. Four follow the
 palette: `--syntax-comment` is `--text-dim`, `--syntax-function` is `--accent`,
 `--syntax-inserted` is `--status-done` and `--syntax-deleted` is `--status-blocked`. The other six are literals per block
 (each at least 4.5:1 on `--bg-panel` and `--bg-elevated`). Catppuccin follows Catppuccin's own mapping: keywords are mauve, so `--syntax-function` is
-blue there instead of `--accent`, and Latte's colors are darkened to stay readable.
+blue there instead of `--accent`, and Latte's colors are darkened to stay readable. Rosé Pine
+follows Rosé Pine's: keywords Pine, functions Rose, so `--syntax-function` is Rose there (Moon
+`#ea9a97`, Dawn `#925856`); Moon's Pine and Love are lightened and Dawn's accents darkened to stay readable.
 
 | Block | keyword | string | number | type | variable | meta |
 |-------|---------|--------|--------|------|----------|------|
@@ -142,6 +178,8 @@ blue there instead of `--accent`, and Latte's colors are darkened to stay readab
 | Dark charcoal | `#d7a08a` | `#a7b789` | `#c2a2af` | `#9fb4c2` | `#dcd8d0` | `#b8a5c9` |
 | Catppuccin Mocha | `#cba6f7` | `#a6e3a1` | `#fab387` | `#f9e2af` | `#f5e0dc` | `#f5c2e7` |
 | Catppuccin Latte | `#712fc6` | `#2f7620` | `#b44201` | `#905c13` | `#4c4f69` | `#bc1d91` |
+| Rosé Pine Moon | `#6caac3` | `#f6c177` | `#ee82a0` | `#9ccfd8` | `#e0def4` | `#c4a7e7` |
+| Rosé Pine Dawn | `#286983` | `#8f6020` | `#995468` | `#417079` | `#575279` | `#736287` |
 
 `--syntax-function` in Catppuccin: Mocha `#89b4fa`, Latte `#0b59f4`.
 
@@ -152,7 +190,7 @@ blue there instead of `--accent`, and Latte's colors are darkened to stay readab
   color is not the only sign. It is a warning yellow, at least 4.5:1 on
   `--bg`, `--bg-panel` and `--bg-elevated`: amber `#e8c55c` / `#7a5a00`, light
   charcoal `#8a5300`, dark charcoal `#d9b26a`, Catppuccin Mocha `#f9e2af` (yellow), Latte
-  `#8a5710`.
+  `#8a5710`, Rosé Pine Moon Gold `#f6c177`, Dawn `#7e551c`.
 - `--line-number` colors the line numbers beside code: tertiary text, quieter than the code. It is
   `--text-dim`, except in Catppuccin, whose `--text-dim` (subtext1) is nearly `--text`: Mocha
   overlay2 `#9399b2` (5.8:1), Latte `#64677d` (subtext0 darkened to 4.9:1 on `--bg`).
@@ -237,7 +275,7 @@ The values are the ones in `src/styles.css`. Every token but `--fs-input` is `ca
 
 ### Settings
 - `theme`: `dark`, `light`, or `system`; default `dark`.
-- `palette`: `amber`, `charcoal` or `catppuccin`; default `amber`. A removed palette (`report`,
+- `palette`: `amber`, `charcoal`, `catppuccin` or `rose-pine`; default `amber`. A removed palette (`report`,
   `lilac`, `forest`) loads as `amber`.
 - `density`: `comfortable` or `compact`; default `comfortable`.
 - `sidebarRows`: `one` or `two`; default `two`.
