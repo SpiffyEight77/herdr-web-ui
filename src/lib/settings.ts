@@ -6,6 +6,7 @@
  */
 
 import { createContext, createElement, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import type { ITheme } from "@xterm/xterm";
 import { LANGUAGE_SETTINGS, LOCALE_TAGS, resolveLanguage, setCurrentLanguage, type Language, type LanguageSetting } from "./i18n.ts";
 import type { AlertPrefs, DoneAlerts } from "../../shared/notify-policy.ts";
 import { chatFontStack, sanitizeFontFamily } from "./fontFamily.ts";
@@ -22,8 +23,9 @@ export type UsageCount = "used" | "left";
 /** the limit a plan meter shows: the plan's week, or its short session (5 hours on Claude and Codex) */
 export type UsageGlance = "week" | "session";
 /** amber: the herdr look (the default); report: the dark technical report look; charcoal: neutral Ghostty-style dark;
- *  catppuccin: Catppuccin Mocha in dark, Latte in light; lilac: lavender surfaces and indigo accents */
-export type Palette = "amber" | "report" | "charcoal" | "catppuccin" | "lilac";
+ *  catppuccin: Catppuccin Mocha in dark, Latte in light; lilac: lavender surfaces and indigo accents;
+ *  rose-pine: Rosé Pine Moon in dark, default amber in light */
+export type Palette = "amber" | "report" | "charcoal" | "catppuccin" | "lilac" | "rose-pine";
 /** the chat lane's widest: the transcript, the composer column and the held list share it (--chat-w in src/styles.css).
  *  narrow: 820px; default: follows the pane, up to 60rem (chatLaneWidth); wide: 72rem; full: the pane, less the gutters */
 export type ChatWidth = "narrow" | "default" | "wide" | "full";
@@ -254,7 +256,7 @@ export function sanitizeSettings(raw: unknown): Settings {
     theme: theme === "dark" || theme === "light" || theme === "system" ? theme : DEFAULT_SETTINGS.theme,
     density: density === "compact" || density === "comfortable" ? density : DEFAULT_SETTINGS.density,
     sidebarRows: record["sidebarRows"] === "one" || record["sidebarRows"] === "two" ? record["sidebarRows"] : DEFAULT_SETTINGS.sidebarRows,
-    palette: record["palette"] === "amber" || record["palette"] === "report" || record["palette"] === "charcoal" || record["palette"] === "catppuccin" || record["palette"] === "lilac" ? record["palette"] : DEFAULT_SETTINGS.palette,
+    palette: record["palette"] === "amber" || record["palette"] === "report" || record["palette"] === "charcoal" || record["palette"] === "catppuccin" || record["palette"] === "lilac" || record["palette"] === "rose-pine" ? record["palette"] : DEFAULT_SETTINGS.palette,
     terminalFontSize: typeof font === "number" && Number.isFinite(font) ? clampFont(font) : DEFAULT_SETTINGS.terminalFontSize,
     terminalWheelSpeed: typeof record["terminalWheelSpeed"] === "number" && Number.isFinite(record["terminalWheelSpeed"])
       ? Math.min(TERMINAL_WHEEL_SPEED_MAX, Math.max(TERMINAL_WHEEL_SPEED_MIN, Math.round(record["terminalWheelSpeed"])))
@@ -316,9 +318,9 @@ export function resolveTheme(setting: ThemeSetting): ResolvedTheme {
   return typeof window !== "undefined" && window.matchMedia?.(DARK_QUERY).matches === false ? "light" : "dark";
 }
 
-type TerminalColors = { background: string; foreground: string; cursor: string; selectionBackground: string };
+type TerminalColors = ITheme & { background: string; foreground: string; cursor: string; selectionBackground: string };
 
-/** The xterm theme for a resolved theme and palette: the `--term-*` tokens of src/styles.css, verbatim. */
+/** The xterm theme: base colors mirror `--term-*` in src/styles.css; ANSI overrides are terminal-only. */
 const TERMINAL_THEMES: Record<Palette, Record<ResolvedTheme, TerminalColors>> = {
   amber: {
     light: { background: "#faf8f3", foreground: "#2a251f", cursor: "#8c5000", selectionBackground: "#f0d9ae" },
@@ -340,6 +342,17 @@ const TERMINAL_THEMES: Record<Palette, Record<ResolvedTheme, TerminalColors>> = 
     light: { background: "#f8f7fe", foreground: "#2b2d4d", cursor: "#4a42c2", selectionBackground: "#dcd7f8" },
     dark: { background: "#18172f", foreground: "#dcdaf4", cursor: "#b3abff", selectionBackground: "#3a3768" },
   },
+  "rose-pine": {
+    light: { background: "#faf8f3", foreground: "#2a251f", cursor: "#8c5000", selectionBackground: "#f0d9ae" },
+    dark: {
+      background: "#232136", foreground: "#e0def4", cursor: "#ea9a97", selectionBackground: "#44415a",
+      // Ghostty's Rose Pine Moon ANSI slots 0–15; see DESIGN.md for the source.
+      black: "#393552", red: "#eb6f92", green: "#3e8fb0", yellow: "#f6c177",
+      blue: "#9ccfd8", magenta: "#c4a7e7", cyan: "#ea9a97", white: "#e0def4",
+      brightBlack: "#6e6a86", brightRed: "#eb6f92", brightGreen: "#3e8fb0", brightYellow: "#f6c177",
+      brightBlue: "#9ccfd8", brightMagenta: "#c4a7e7", brightCyan: "#ea9a97", brightWhite: "#e0def4",
+    },
+  },
 };
 
 export function terminalTheme(theme: ResolvedTheme, palette: Palette = "amber"): TerminalColors {
@@ -353,6 +366,7 @@ const THEME_COLOR: Record<Palette, Record<ResolvedTheme, string>> = {
   charcoal: { dark: "#171717", light: "#fafaf9" },
   catppuccin: { dark: "#181825", light: "#e6e9ef" },
   lilac: { dark: "#1c1b34", light: "#f6f5fe" },
+  "rose-pine": { dark: "#2a273f", light: "#faf8f3" },
 };
 
 function applyToDocument(settings: Settings, resolved: ResolvedTheme, language: Language): void {

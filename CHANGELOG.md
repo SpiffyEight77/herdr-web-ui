@@ -7,6 +7,11 @@ between releases do not reach them. Remote-PC runtime bundles are versioned sepa
 
 ## [Unreleased]
 
+### Added
+- Rosé Pine Moon is available in Settings → Appearance → Colors for dark mode, including terminal
+  base colors, Ghostty's ANSI 16-color palette, and the PWA title bar. Light mode keeps the default
+  amber palette.
+
 ### Fixed
 - Secret input and the Codex follow-up fallback validate the live screen, so a password
   prompt or collapsed question queue in scrollback cannot send input into the current program.

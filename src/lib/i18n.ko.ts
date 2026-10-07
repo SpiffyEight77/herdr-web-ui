@@ -36,6 +36,7 @@ export const KO: Record<string, string> = {
   "Amber": "앰버",
   "Catppuccin": "Catppuccin",
   "Lilac": "연보라",
+  "Rosé Pine Moon": "Rosé Pine Moon",
   "Density": "밀도",
   "Comfortable": "여유",
   "Compact": "촘촘",

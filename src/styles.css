@@ -7,7 +7,7 @@
  * the attribute); `[data-density="compact"]` overrides the type scale and row
  * heights. The base blocks are the amber palette, the default and the look before
  * settings load; `[data-palette]` blocks override them for the opt-in report,
- * charcoal and catppuccin palettes. xterm cannot read CSS custom properties, so the --term-* group
+ * charcoal, catppuccin, lilac and rose-pine palettes. xterm cannot read CSS custom properties, so the --term-* group
  * is mirrored in settings.ts `terminalTheme()`.
  * Component-scoped rules live beside their component (Sidebar.css,
  * PaneTerminal.css, ...); this file owns the app shell, the header and the
@@ -481,6 +481,45 @@
   --term-fg: #2b2d4d;
   --term-cursor: #4a42c2;
   --term-selection: #dcd7f8;
+}
+
+/* Rosé Pine Moon (rosepinetheme.com/palette): dark only; light keeps default amber.
+   Base content, Surface chrome, Overlay elevated/hover, Iris accent, Rose cursor.
+   Subtle is lightened 17% for dimmed text; input uses Rose rather than Love, with
+   an 8% tint, to keep AA contrast on Overlay. Primary hover is Iris lightened 20%.
+   The existing rose-pine key preserves the user's palette selection. */
+[data-theme="dark"][data-palette="rose-pine"] {
+  --bg: #232136;
+  --bg-panel: #2a273f;
+  --bg-elevated: #393552;
+  --bg-hover: #393552;
+  --bg-input: #232136;
+  --border: #44415a;
+  --border-strong: #56526e;
+  --bubble-border: var(--border);
+  --text: #e0def4;
+  --text-dim: #a3a0b8;
+  --text-strong: #e0def4;
+  --accent: #c4a7e7;
+  --accent-tint: rgba(196, 167, 231, 0.12);
+  --primary: #c4a7e7;
+  --primary-hover: #d0b9ec;
+  --primary-text: #232136;
+  --primary-tint: rgba(196, 167, 231, 0.16);
+  --status-idle: #a3a0b8;
+  --status-working: #f6c177;
+  --status-blocked: #ea9a97;
+  --status-done: #9ccfd8;
+  --status-working-tint: rgba(246, 193, 119, 0.14);
+  --status-blocked-tint: rgba(234, 154, 151, 0.08);
+  --status-done-tint: rgba(156, 207, 216, 0.14);
+  --danger-tint: rgba(234, 154, 151, 0.08);
+  --danger-text: #ea9a97;
+  --scrim: rgba(35, 33, 54, 0.6);
+  --term-bg: #232136;
+  --term-fg: #e0def4;
+  --term-cursor: #ea9a97;
+  --term-selection: #44415a;
 }
 
 [data-chat-width="narrow"] {

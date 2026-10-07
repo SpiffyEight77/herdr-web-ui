@@ -40,6 +40,7 @@ export const ZH: Record<string, string> = {
   "Amber": "琥珀",
   "Catppuccin": "Catppuccin",
   "Lilac": "淡紫",
+  "Rosé Pine Moon": "Rosé Pine Moon",
   "Density": "密度",
   "Comfortable": "宽松",
   "Compact": "紧凑",

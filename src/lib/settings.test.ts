@@ -343,6 +343,7 @@ describe("palette", () => {
     expect(sanitizeSettings({ palette: "charcoal" }).palette).toBe("charcoal");
     expect(sanitizeSettings({ palette: "catppuccin" }).palette).toBe("catppuccin");
     expect(sanitizeSettings({ palette: "lilac" }).palette).toBe("lilac");
+    expect(sanitizeSettings({ palette: "rose-pine" }).palette).toBe("rose-pine");
     expect(sanitizeSettings({ palette: "pink" }).palette).toBe("amber");
   });
 
@@ -365,6 +366,8 @@ describe("palette", () => {
     { theme: "light", palette: "catppuccin", layers: ['[data-theme="light"][data-palette="catppuccin"]', '[data-theme="light"]', ":root"] },
     { theme: "dark", palette: "lilac", layers: ['[data-theme="dark"][data-palette="lilac"]', ":root"] },
     { theme: "light", palette: "lilac", layers: ['[data-theme="light"][data-palette="lilac"]', '[data-theme="light"]', ":root"] },
+    { theme: "dark", palette: "rose-pine", layers: ['[data-theme="dark"][data-palette="rose-pine"]', ":root"] },
+    { theme: "light", palette: "rose-pine", layers: ['[data-theme="light"]', ":root"] },
   ] as const;
   const tokens = (layers: readonly string[]) => (name: string): string =>
     layers.map((selector) => block(selector).match(new RegExp(`--${name}: ([^;]+);`))?.[1]).find((value) => value !== undefined)!;
@@ -372,7 +375,7 @@ describe("palette", () => {
   it("mirrors each palette's --term-* tokens of styles.css for xterm", () => {
     for (const { theme, palette, layers } of cases) {
       const read = tokens(layers);
-      expect(terminalTheme(theme, palette)).toEqual({ background: read("term-bg"), foreground: read("term-fg"), cursor: read("term-cursor"), selectionBackground: read("term-selection") });
+      expect(terminalTheme(theme, palette)).toMatchObject({ background: read("term-bg"), foreground: read("term-fg"), cursor: read("term-cursor"), selectionBackground: read("term-selection") });
     }
   });
 
@@ -412,6 +415,28 @@ describe("palette", () => {
       }
     }
     expect(failures).toEqual([]);
+  });
+
+  it("uses Moon base colors and Ghostty's ANSI 16 colors for the existing Rosé Pine selection", () => {
+    expect(terminalTheme("dark", "rose-pine")).toEqual({
+      background: "#232136", foreground: "#e0def4", cursor: "#ea9a97", selectionBackground: "#44415a",
+      black: "#393552", red: "#eb6f92", green: "#3e8fb0", yellow: "#f6c177",
+      blue: "#9ccfd8", magenta: "#c4a7e7", cyan: "#ea9a97", white: "#e0def4",
+      brightBlack: "#6e6a86", brightRed: "#eb6f92", brightGreen: "#3e8fb0", brightYellow: "#f6c177",
+      brightBlue: "#9ccfd8", brightMagenta: "#c4a7e7", brightCyan: "#ea9a97", brightWhite: "#e0def4",
+    });
+  });
+
+  it("leaves other palettes and light mode on xterm's default ANSI colors", () => {
+    for (const { theme, palette } of cases) {
+      if (theme === "dark" && palette === "rose-pine") continue;
+      expect(Object.keys(terminalTheme(theme, palette)).sort()).toEqual(["background", "cursor", "foreground", "selectionBackground"]);
+    }
+  });
+
+  it("keeps the default light colors for the dark-only Rosé Pine Moon palette", () => {
+    expect(terminalTheme("light", "rose-pine")).toEqual(terminalTheme("light", "amber"));
+    expect(css).not.toContain('[data-theme="light"][data-palette="rose-pine"]');
   });
 
   it("paints amber before settings load: the base blocks are the default palette's", () => {
